@@ -1,0 +1,12 @@
+cassandra-driver
+Flask 
+flask-cors
+astrapy
+python-dotenv
+datasets 
+langchain 
+openai 
+tiktoken
+autogen
+Flask
+Gunicorn
