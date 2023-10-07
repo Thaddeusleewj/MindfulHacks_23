@@ -6,11 +6,22 @@ import itertools
 from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for, session
 # from embedstore import load_embedding
-
+import sys
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+# Get the absolute path to the directory containing this script (app.py)
+current_directory = os.path.dirname(os.path.realpath(__file__))
+
+# Add the 'modules' directory to sys.path
+LLM_directory = os.path.join(current_directory, 'llm')
+Supabase_directory = os.path.join(current_directory, 'Supabase')
+# utils_directory = os.path.join(current_directory, 'utils')
+sys.path.append(Supabase_directory)
+sys.path.append(LLM_directory)
+# sys.path.append(utils_directory)
+
+# app.secret_key = os.getenv("SECRET_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 from llm.main import TherapistLLM
 
@@ -49,7 +60,6 @@ current_therapistLLM = TherapistLLM()
 # Generate a checkup question
 @app.route('/checkup', methods=['GET'])
 def get_checkup_question():
-
     checkup_question = current_therapistLLM.get_checkUp_question()
     session['checkup_question'] = checkup_question
     return checkup_question

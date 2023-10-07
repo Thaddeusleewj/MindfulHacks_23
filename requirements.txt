@@ -10,5 +10,4 @@ autogen
 Flask
 Gunicorn
 pinecone-client
-embedstore
 supabase
