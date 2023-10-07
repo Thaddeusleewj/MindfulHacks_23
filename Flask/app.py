@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, request
+import openai
 
 app = Flask(__name__)
 
@@ -6,7 +7,18 @@ app = Flask(__name__)
 def hello_world():
     return 'hello world'
 
-# Create a route for langchain 
+@app.route('/transcript', methods=['POST'])
+def transcript():
+    files = request.files
+    file = files.get('file')
+    with open("temp.mp3", "wb") as f:
+        f.write(file)
+        f.close()
+        
+    audio_file= open("temp.mp3", "rb")
+    transcript = openai.Audio.transcribe("whisper-1", audio_file)
+    
+    return transcript
 
 if __name__ == '__main__':
     app.run(debug=True)
