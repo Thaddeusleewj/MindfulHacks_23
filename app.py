@@ -25,7 +25,7 @@ sys.path.append(LLM_directory)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 from llm.main import TherapistLLM
 
-current_therapistLLM = TherapistLLM()
+# current_therapistLLM = TherapistLLM()
 
 # @app.route('/', methods=['GET', 'POST'])
 # def run_bot():
@@ -63,7 +63,7 @@ current_therapistLLM = TherapistLLM()
     
 @app.route('/checkup', methods=['GET'])
 def get_checkup_question():
-    checkup_question = current_therapistLLM.get_checkUp_question()
+    checkup_question = TherapistLLM.get_checkUp_question()
     session['checkup_question'] = checkup_question
     return checkup_question
 

@@ -25,16 +25,3 @@ memory = VectorStoreRetrieverMemory(retriever=retriever)
 memory.save_context({"input": "My problem is I very sad due to a breakup with my girlfriend"}, {"output": "Oh, I'm so sorry to hear that, that can be really tough. Want to talk about it? I’m happy to lend an ear. Was it a mutual decision or a difficult break up?"})
 # memory.save_context({"input": "My favorite sport is soccer"}, {"output": "..."})
 # memory.save_context({"input": "I don't the Celtics"}, {"output": "ok"}) #
-
-# memory
-
-
-class pineconeInit:
-    """
-    Initialize the pinecone client
-    """
-
-    embeddings = OpenAIEmbeddings(model='text-embedding-ada-002')
-    vectorstore = Pinecone(index, embeddings.embed_query, "text")
-
-    def 

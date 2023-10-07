@@ -10,9 +10,11 @@ from datetime import datetime
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import OpenAI
 from langchain.memory import VectorStoreRetrieverMemory
-from langchain.chains import ConversationChain
+from langchain.chains import ConversationChain,RetrievalQA
 from langchain.prompts import PromptTemplate
 from .memory import memory
+import pinecone
+from langchain.vectorstores import Pinecone
 
 checkUp_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
 checkUpDetails_schema = {
@@ -64,9 +66,53 @@ conversation_with_summary = ConversationChain(
 )
 
 
-# Retrival QA chain
-qa = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=vectorstore.as_retriever()
-)
+class QAretrivalChain:
+    """Special QA chain pinecone"""
+
+    @classmethod
+    def init(cls, PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME):
+        """Initialize the QAretrivalChain with the pinecone API key and environment"""
+                # Create LLMChain
+        try:
+            vectorstore = cls._initPinecone(PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME)
+            qa_chain = RetrievalQA.from_chain_type(
+            llm= OpenAI(model_name="gpt-3.5-turbo-0613", temperature=0),
+            chain_type="refine",
+            retriever=vectorstore.as_retriever(),
+            verbose=True,
+            )
+        except Exception as e:
+            raise Exception(f"Error creating qa_chain: {e}")
+        
+
+        return qa_chain
+    
+    @classmethod
+    def _initPinecone(cls,PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME):
+        """Returns a pinecone vectorstore"""
+
+        # initialize pinecone
+        pinecone.init(
+            api_key=PINECONE_API_KEY,  # find at app.pinecone.io
+            environment=PINECONE_ENVIRONMENT,  # next to api key in console
+        )
+
+        index_name = INDEX_NAME
+
+        embeddings = OpenAIEmbeddings(model='text-embedding-ada-002')
+
+        # List all indexes information
+        index_description = pinecone.describe_index(index_name)
+        print('index_description: ', index_description)
+
+        index = pinecone.Index(index_name) 
+        index_stats_response = index.describe_index_stats()
+        print('index_stats_response: ', index_stats_response)
+
+        # Create vectorstore
+        try:
+            vectorstore = Pinecone(index, embeddings.embed_query, "text")
+            print('vectorstore created succesfully')
+            return vectorstore
+        except Exception as e:
+            raise Exception(f"Error creating vectorstore: {e}")
