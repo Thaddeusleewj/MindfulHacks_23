@@ -1,9 +1,11 @@
 import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react";
 import { useContext, createContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SidebarContext = createContext();
 
 export default function Sidebar({ children }) {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
 
   return (
@@ -26,7 +28,14 @@ export default function Sidebar({ children }) {
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
-            <ul className="flex-1 px-3">{children}</ul>
+            <ul className="flex-1 px-3">
+              <li>
+                <button onClick={() => {navigate("/")}}>Recording</button>
+              </li>
+              <li>
+                <button onClick={() => {navigate("/Report")}}>Report</button>
+              </li>
+            </ul>
           </SidebarContext.Provider>
 
           <div className="border-t flex p-3">
@@ -35,6 +44,7 @@ export default function Sidebar({ children }) {
               alt=""
               className="w-10 h-10 rounded-md"
             />
+
             <div className={`flex justify-between items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}>
               <div className="leading-4">
                 <h4 className="font-semibold">John Doe</h4>
