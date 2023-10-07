@@ -27,8 +27,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 chrome.commands.onCommand.addListener((command, tab) => {
   if (command == "NewPet") {
     const aPet = {
-      size: Math.floor(Math.random() * 260 + 40),
-      color: Math.floor(Math.random() * 360),
+      size: 200,
       id: randId(),
     };
 

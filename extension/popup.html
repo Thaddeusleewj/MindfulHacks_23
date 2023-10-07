@@ -5,17 +5,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TherapLink</title>
-    <link rel="stylesheet" type="text/css" href="./css/main.css" />
     <link rel="stylesheet" type="text/css" href="popup.css" />
-    <script src="./css/tailwind.js"></script>
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="img-src * 'self' data: https:"
-    />
+    <script src="tailwind.js"></script>
   </head>
-  <body class="rounded-lg">
-    <div class="text-xl font-bold">Hello</div>
-    <div class="container">
+  <body>
+    <div class="flex flex-col">
+      <div class="text-xl font-bold text-center">TherapLink</div>
+      <div class="text-base text-center">Qlee</div>
+    </div>
+    <div id="QleeWrapper">
+      <div id="Qlee"></div>
+    </div>
+    <div class="flex justify-center mt-2">
+      <button
+        type="button"
+        id="btn"
+        data-stop="false"
+        class="rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+      >
+        Start
+      </button>
+    </div>
+    <!-- <div class="container">
       <label for="switch1">睡覺</label>
       <label class="switch">
         <input type="checkbox" data-Myclass="sleeping" id="switch1" />
@@ -53,7 +64,7 @@
       <div class="slider-containerr">
         <button id="createButton">產生</button>
       </div>
-    </div>
+    </div> -->
     <script src="popup.js"></script>
   </body>
 </html>

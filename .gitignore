@@ -285,3 +285,5 @@ cython_debug/
 #.idea/
 # Streamlit secrets
 .streamlit/
+
+demo.html
