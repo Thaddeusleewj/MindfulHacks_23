@@ -23,22 +23,23 @@ patientInfoDetails_schema = {
     "properties": {
         "MainProblems":{
             "type": "string",
-            "Description": "Main problems faced by the patient"
+            "Description": "Main problems faced by the patient, List down everything and anything that the patient is facing, no matter how small"
         },
-        "PatientInfo":{
+        "AnythingRelevant":{
             "type": "string",
-            "Description": "Summary of the patient's mental health"
+            "Description": "Any other relevant information, you think is useful to the theripist to aid the patient"
         },
     },# TODO: Get actual disruption Event Date, and accurate loop
-    "required": ["MainProblems","PatientInfo"]
+    "required": ["MainProblems","AnythingRelevant"]
 }
 
 # TODO: ADD THE FUCKIGN IGIGEIGEIFNIFEANIO
 patientInfoPrompt = PromptTemplate(
-    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What are my goals and objectives related to this problem or challenge?\n2.How can I prioritize and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:\n{transcript}""",
+    template = """Role: You are a transcript extractor for a therapy session, your goal is to extract key information of the patient from the transcript between theripist and patient. Information such as Main Problems and anything u find relevant\n\nTranscript:\n{transcript}""",
     input_variables=["transcript"]
 )
 patientInfoChain = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llm,prompt=patientInfoPrompt)
+
 
 checkUp_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
 checkUpDetails_schema = {

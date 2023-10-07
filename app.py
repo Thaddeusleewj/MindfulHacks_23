@@ -26,11 +26,17 @@ from Supabase.Insertor import SupabaseInsertor
 # sys.path.append(utils_directory)
 SUPABASE_URL=os.getenv("SUPABASE_URL")
 SUPABASE_KEY=os.getenv("SUPABASE_KEY")
+PINECONE_API_KEY=os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX_NAME=os.getenv("PINECONE_INDEX_NAME")
+PINECONE_ENVIRONMENT=os.getenv("PINECONE_ENVIRONMENT")
+
 client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 supabaseInsertor = SupabaseInsertor(client)
 # app.secret_key = os.getenv("SECRET_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+therapistLLM = TherapistLLM(PINECONE_API_KEY=PINECONE_API_KEY, INDEX_NAME=PINECONE_INDEX_NAME, PINECONE_ENVIRONMENT=PINECONE_ENVIRONMENT, SUPABASE_URL=SUPABASE_URL, SUPABASE_KEY=SUPABASE_KEY)
 
 
 # current_therapistLLM = TherapistLLM()
@@ -71,28 +77,27 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 def hello_world():
     return 'hello world'
 
-# @app.route('/transcript', methods=['POST'])
-# def transcript():
-#     print(request)
-#     files = request.files
-#     file = files.get('file')
-#     print(file)
-#     file.save("./temp.mp3")
+@app.route('/transcript', methods=['POST'])
+def transcript():
+    print(request)
+    files = request.files
+    file = files.get('file')
+    print(file)
+    file.save("./temp.mp3")
         
-#     with open("./temp.mp3", "rb") as f:
-#         print("Processing...")
-#         transcript = openai.Audio.transcribe("whisper-1", f)
-#         f.close()
+    with open("./temp.mp3", "rb") as f:
+        print("Processing...")
+        transcript = openai.Audio.transcribe("whisper-1", f)
+        f.close()
 
-#     os.remove("./temp.mp3")
-#     response = supabaseInsertor.addTherapyData(transcript)
-#     print(response)
-
-#     return response
+    os.remove("./temp.mp3")
+    response = supabaseInsertor.addTherapyData(transcript)
+    print(response)
+    return response
 
 @app.route('/get_checkUp_question', methods=['GET'])
 def get_checkup_question():
-    checkup_question = TherapistLLM.get_checkUp_question()
+    checkup_question = therapistLLM.get_checkUp_question()
     session['checkup_question'] = checkup_question
     return checkup_question
 

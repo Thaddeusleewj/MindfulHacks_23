@@ -19,7 +19,7 @@ class TherapistLLM:
     Short-term memory will be lost at each new creation of the TheripistLLM
     """
 
-    def __init__(self,PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME):
+    def __init__(self,PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME,SUPABASE_KEY,SUPABASE_URL):
         """Initialize the LLM with whatever other shit we need #TODO
         1. Create new short term memory buffer
         """
