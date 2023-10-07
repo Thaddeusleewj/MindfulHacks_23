@@ -19,6 +19,10 @@ Supabase_directory = os.path.join(current_directory, 'Supabase')
 # utils_directory = os.path.join(current_directory, 'utils')
 sys.path.append(Supabase_directory)
 sys.path.append(LLM_directory)
+
+from llm.main import TherapistLLM
+from Supabase.Insertor import SupabaseInsertor
+
 # sys.path.append(utils_directory)
 SUPABASE_URL=os.getenv("SUPABASE_URL")
 SUPABASE_KEY=os.getenv("SUPABASE_KEY")
@@ -27,8 +31,7 @@ client = create_client(SUPABASE_URL, SUPABASE_KEY)
 supabaseInsertor = SupabaseInsertor(client)
 # app.secret_key = os.getenv("SECRET_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
-from llm.main import TherapistLLM
-from Supabase.Insertor import SupabaseInsertor
+
 
 # current_therapistLLM = TherapistLLM()
 
