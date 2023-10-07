@@ -97,19 +97,28 @@ def transcript():
 
 @app.route('/get_checkUp_question', methods=['GET'])
 def get_checkup_question():
+    """Returns json with Keys Question1 and Question2, {
+        "Question1": "xxxxxxxxxx",
+        "Question2": "xxxxxxxxxx"
+    }"""
     # checkup_question = therapistLLM.get_checkUp_question()
     # print('checkup_question: ', checkup_question)
     # session['checkup_question'] = checkup_question
-    return ("JournalPromptQuestion1 placeholder","JournalPromptQuestion2 placeholder")
+
+    return {"Question1": "xxxxxxxxxx", "Question2": "xxxxxxxxxx"}
 
 @app.route('/obtain_follow_up_checkUp_advice', methods=['POST'])
 def get_follow_up_checkUp_advice():
+    """Returns json with Keys Question1 and Question2, {
+        "Advice1": "xxxxxxxxxx",
+        "Advice2": "xxxxxxxxxx"
+    }"""
     # Takes in two inputs, checkUp_question, and user_response --> returns follow_up_checkUp_advice
     PatientJournalReflection = request.form.get('PatientJournalReflection')
     # follow_up_checkUp_advice = therapistLLM.get_follow_up_checkUp_advice(user_response = PatientJournalReflection)
 
 
-    return (f"follow_up_checkUp_advice placeholder with user reflection:{PatientJournalReflection}", "follow_up_checkUp_advice placeholder with user reflection:{PatientJournalReflection}")
+    return {"Advice1": "this is advice with user", "Advice2": "xxxxxxxxxx"}
 
 # Test supabase insert
 @app.route('/insert', methods=['GET'])
