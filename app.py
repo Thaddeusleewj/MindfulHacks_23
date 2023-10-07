@@ -98,7 +98,7 @@ def transcript():
 @app.route('/get_checkUp_question', methods=['GET'])
 def get_checkup_question():
     checkup_question = therapistLLM.get_checkUp_question()
-    session['checkup_question'] = checkup_question
+    # session['checkup_question'] = checkup_question
     return checkup_question
 
 # @app.route('/obtain_follow_up_checkUp_advice', methods=['POST'])

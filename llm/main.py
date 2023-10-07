@@ -6,13 +6,15 @@ from langchain.llms import OpenAI
 from langchain.memory import VectorStoreRetrieverMemory
 from langchain.chains import ConversationChain
 from langchain.prompts import PromptTemplate
-
+from langchain.chains import RetrievalQA
+from langchain.chains import LLMChain
 import faiss
 
 from langchain.docstore import InMemoryDocstore
-from langchain.vectorstores import FAISS
-
+from .chains import transcriptExtractorChain, checkUpChain
 from .memory import memory
+
+from pineconeManager.Retrival import PineconeRetrival
 class TherapistLLM:
     """Main wrapper for the Short-Term Memory LLM
 
@@ -24,18 +26,22 @@ class TherapistLLM:
         1. Create new short term memory buffer
         """
         self.memory = memory
+        self.transcriptExtractorChain: LLMChain = transcriptExtractorChain
+        self.checkUpChain: LLMChain = checkUpChain
+        self.pineconeRetrival:PineconeRetrival = PineconeRetrival()
+        # self.follow_up_checkUp_advice: LLMChain = followUpCheckUpAdviceChain 
         # self.memory.save_context({"input": "My problem is I very sad due to a breakup with my girlfriend"}, {"output": "Oh, I'm so sorry to hear that, that can be really tough. Want to talk about it? Im happy to lend an ear. Was it a mutual decision or a difficult break up?"})
         pass
     
     def get_checkUp_question(self) -> tuple[str,str]:
         """Returns a checkup questions based on Long-Term memory"""
-        # TODO
+        # TODO 
         return ("This is the check up Question1", "This is check up Question2")
     
     
     def get_follow_up_checkUp_advice(self,checkUp_question:tuple[str,str], user_response:str) -> tuple[str,str]:
         """Returns a follow up checkup questions based on Long-Term memory"""
-        # TODO
+        # TODO 
         return (f"This is the follow up check up Advice1 based on :checkup{checkUp_question}", f"This is follow up check up Advice2 and user_response-->{user_response}")
     
     def update_memory(self,llm_output, user_query):

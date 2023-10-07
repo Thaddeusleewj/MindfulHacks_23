@@ -38,7 +38,7 @@ patientInfoPrompt = PromptTemplate(
     template = """Role: You are a transcript extractor for a therapy session, your goal is to extract key information of the patient from the transcript between theripist and patient. Information such as Main Problems and anything u find relevant\n\nTranscript:\n{transcript}""",
     input_variables=["transcript"]
 )
-patientInfoChain = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llm,prompt=patientInfoPrompt)
+transcriptExtractorChain = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llm,prompt=patientInfoPrompt)
 
 
 checkUp_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
