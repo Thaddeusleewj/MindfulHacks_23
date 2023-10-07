@@ -1,8 +1,8 @@
 import { React, useState, useRef, useEffect } from "react";
-import { supabase } from "../API/Auth";
 
 import { MicOff, Mic } from "lucide-react";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
+// import { AudioUtils } from "../Utils/AudioUtils";
 
 import axios from "axios";
 
@@ -34,10 +34,10 @@ export default function App() {
     document.body.appendChild(audio);
     console.log(typeof blob.type);
     let formData = new FormData();
-    let audioFile = new File([blob], "audio.mp3", { type: blob.type })  
+    let audioFile = new File([blob], "audio.mp3", { type: blob.type });
     formData.append("file", audioFile, "audio.mp3");
     axios
-      .post("http://127.0.0.1:5000/transcript", formData, {
+      .post(import.meta.env.VITE_DEV + "/transcript", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => {
