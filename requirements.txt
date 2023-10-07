@@ -4,7 +4,7 @@ flask-cors
 astrapy
 python-dotenv
 datasets 
-langchain 
+langchain==0.0.292
 openai 
 autogen
 Flask
@@ -13,3 +13,4 @@ pinecone-client
 supabase
 faiss-cpu
 tiktoken
+jsonschema

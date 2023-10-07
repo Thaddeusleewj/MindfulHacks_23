@@ -36,7 +36,7 @@ supabaseInsertor = SupabaseInsertor(client)
 # app.secret_key = os.getenv("SECRET_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-therapistLLM = TherapistLLM(PINECONE_API_KEY=PINECONE_API_KEY, INDEX_NAME=PINECONE_INDEX_NAME, PINECONE_ENVIRONMENT=PINECONE_ENVIRONMENT, SUPABASE_URL=SUPABASE_URL, SUPABASE_KEY=SUPABASE_KEY)
+therapistLLM = TherapistLLM(SUPABASE_URL=SUPABASE_URL, SUPABASE_KEY=SUPABASE_KEY)
 
 
 # current_therapistLLM = TherapistLLM()
@@ -101,13 +101,13 @@ def get_checkup_question():
     # session['checkup_question'] = checkup_question
     return checkup_question
 
-# @app.route('/obtain_follow_up_checkUp_advice', methods=['POST'])
-# def get_follow_up_checkUp_advice():
-#     # Takes in two inputs, checkUp_question, and user_response --> returns follow_up_checkUp_advice
-#     checkUp_question = 
+@app.route('/obtain_follow_up_checkUp_advice', methods=['POST'])
+def get_follow_up_checkUp_advice():
+    # Takes in two inputs, checkUp_question, and user_response --> returns follow_up_checkUp_advice
+    PatientJournalReflection = request.form.get('PatientJournalReflection')
+    follow_up_checkUp_advice = therapistLLM.get_follow_up_checkUp_advice(user_response = PatientJournalReflection)
     
-#     checkUp_question:tuple[str,str], 
-#     user_response:str
+    return follow_up_checkUp_advice
 
 # Test supabase insert
 @app.route('/insert', methods=['GET'])

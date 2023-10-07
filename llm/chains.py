@@ -1,21 +1,69 @@
+from datetime import datetime
 
-from langchain.prompts import PromptTemplate
+from .memory import memory
+import pinecone
+
+
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+
+from pydantic import BaseModel, Field
+from datetime import datetime
+from typing import Optional
+
+from langchain import LLMChain, OpenAI, PromptTemplate
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.llms import BaseLLM
+from langchain.vectorstores.base import VectorStore
+from pydantic import BaseModel, Field
+from langchain.chains.base import Chain
+# Langchain
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import Pinecone
+from langchain.document_loaders import TextLoader
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import RetrievalQA, LLMChain ,LLMCheckerChain
+from langchain.callbacks import wandb_tracing_enabled
+from langchain.prompts import (
+    PromptTemplate,
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    StringPromptTemplate
+)
+from langchain.prompts.few_shot import FewShotPromptTemplate
+from langchain.output_parsers import StructuredOutputParser, ResponseSchema
+
+from typing import Optional
+from langchain.chains import SimpleSequentialChain ,SequentialChain
+from langchain.agents import AgentExecutor, Tool, ZeroShotAgent,BaseMultiActionAgent
+from langchain.agents import AgentType, initialize_agent,AgentExecutor,BaseSingleActionAgent
+from langchain.tools import tool
 from langchain.chains.openai_functions import (
     create_openai_fn_chain,
     create_structured_output_chain,
 )
+from langchain.schema import HumanMessage, AIMessage, ChatMessage
+from langchain.vectorstores import FAISS
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.schema import Document
+from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser,Agent
+from langchain.prompts import StringPromptTemplate
+from langchain import OpenAI, SerpAPIWrapper, LLMChain
+from typing import List, Union
+from langchain.schema import AgentAction, AgentFinish, OutputParserException
+import re
+from langchain.agents import Tool, AgentExecutor, BaseSingleActionAgent
+from langchain import OpenAI, SerpAPIWrapper
 
-from datetime import datetime
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import OpenAI
-from langchain.memory import VectorStoreRetrieverMemory
-from langchain.chains import ConversationChain,RetrievalQA
-from langchain.prompts import PromptTemplate
-from .memory import memory
-import pinecone
-from langchain.vectorstores import Pinecone
+from langchain.callbacks.manager import (
+    AsyncCallbackManagerForChainRun,
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForChainRun,
+    CallbackManagerForToolRun,
+    Callbacks,
+)
 
-patientInfo_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
+patientInfo_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
 patientInfoDetails_schema = {
     "name": "patientInfoKeyPoints",
     "description": "Taking in transcript of therapy session, and outputting key points of the session,including main problems faced, feelings, etc",
@@ -35,13 +83,19 @@ patientInfoDetails_schema = {
 
 # TODO: ADD THE FUCKIGN IGIGEIGEIFNIFEANIO
 patientInfoPrompt = PromptTemplate(
-    template = """Role: You are a transcript extractor for a therapy session, your goal is to extract key information of the patient from the transcript between theripist and patient. Information such as Main Problems and anything u find relevant\n\nTranscript:\n{transcript}""",
+    template = """Role: You are a transcript extractor for a therapy session, your goal is to extract key information of the patient from the transcript between theripist and patient. Information such as Main Problems and anything u find relevant\nTranscript:\n{transcript}""",
     input_variables=["transcript"]
 )
 transcriptExtractorChain = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llm,prompt=patientInfoPrompt)
 
+patientInfo_llmGPT4 = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
+patientInfoPromptGPT4 = PromptTemplate(
+    template = """Role: You are a transcript extractor for a therapy session, your goal is to extract key information of the patient from the transcript between theripist and patient. Information such as Main Problems and anything u find relevant\nTranscript:\n{transcript}\nFeedback for output:{feedback}""",
+    input_variables=["transcript","feedback"]
+)
+transcriptExtractorChainGPT4 = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llmGPT4,prompt=patientInfoPromptGPT4)
 
-checkUp_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
+checkUp_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
 checkUpDetails_schema = {
     "name": "eventDetails_schema",
     "description": "Generates, a questions to checkup on the patient's mental health based on the patients history",
@@ -49,94 +103,62 @@ checkUpDetails_schema = {
     "properties": {
         "Question1":{
             "type": "string",
-            "Description": "Perfect checkup Question based on:\n1.History of context of the patient\nGood Journaling Prompt Examples"
+            "Description": "Perfect checkup Journal Prompt based on:\n1.History of context of the patient\nGood Journaling Prompt Examples"
         },
         "Question2":{
             "type": "string",
-            "Description": "Another relevant checkup question, very different froom Question1"
+            "Description": "Another relevant Journal Prompt question, very different froom Question1"
         },
     },# TODO: Get actual disruption Event Date, and accurate loop
     "required": ["Question1","Question2"]
 }
 
 checkUpPrompt = PromptTemplate(
-    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What are my goals and objectives related to this problem or challenge?\n2.How can I prioritize and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:\n{patient_info}""",
-    input_variables=["patient_info"]
+    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What kind of goals and objectives would u want to set, related to this problem X or challenge X?\n2.How do you think you should go about prioritizing and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:1. Main Problems: {MainProblems}\n2. Anything Other Relevant information: {AnythingRelevant}\n\nUsing the above information, craft the perfect Journal Prompt based on the patient's history and the example questions of a good Journaling Prompt.Must output Json""",
+    input_variables=["MainProblems","AnythingRelevant"]
 )
 checkUpChain = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=checkUpPrompt)
 
-
-
-llm = OpenAI(temperature=0) # Can be any valid LLM
-_DEFAULT_TEMPLATE = """The following is a friendly conversation between a human and a theripist. The theripist is meant to help the human with her mental health issues in a positive manner, giving inspirational advice with relevance to the context of the human. If the theripist does not know the answer to a question, it truthfully says it does not know.
-
-Relevant pieces of previous conversation:
-{history}
-
-(You do not need to use these pieces of information if not relevant)
-
-Current conversation:
-Human: {input}
-AI:"""
-PROMPT = PromptTemplate(
-    input_variables=["history", "input"], template=_DEFAULT_TEMPLATE
+checkUp_llmGPT4 = ChatOpenAI(model_name="gpt-4-0613", temperature=1)
+checkUpPromptGPT4 = PromptTemplate(
+    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What kind of goals and objectives would u want to set, related to this problem X or challenge X?\n2.How do you think you should go about prioritizing and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:1. Main Problems: {MainProblems}\n2. Anything Other Relevant information: {AnythingRelevant}\n\nUsing the above information, craft the perfect Journal Prompt based on the patient's history and the example questions of a good Journaling Prompt.Must output Json.\nFeedback:{feedback}""",
+    input_variables=["MainProblems","AnythingRelevant","feedback"]
 )
-conversation_with_summary = ConversationChain(
-    llm=llm, 
-    prompt=PROMPT,
-    # We set a very low max_token_limit for the purposes of testing.
-    memory=memory,
-    verbose=True
+checkUpChainGPT4 = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llmGPT4,prompt=checkUpPromptGPT4)
+
+
+followUpCheckUpAdvice_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
+
+followUpCheckUpAdviceDetails_schema = {
+    "name": "followUpCheckUpAdviceDetails_schema",
+    "description": "Generates, a follow up checkup questions and advice to the patient's mental health based on the patients history",
+    "type": "object",
+    "properties": {
+        "Advice1":{
+            "type": "string",
+            "Description": "Perfect follow up advice based on:\n1.History of context of the patient\n and current journal reflection of the patient\nGood Journaling Prompt Examples"
+        },
+        "Advice2":{
+            "type": "string",
+            "Description": "Another relevant follow up checkup question, very different froom Advice1"
+        },
+}
+}
+
+followUpCheckUpAdvicePrompt = PromptTemplate(
+
+    template = """Role:You are a Theripst checking up on a patient daily, your goal is to give the patient advice based on their journal reflection. Craft the perfect advice based on:\n1.History of context of the patient:\nMain Problems: {MainProblems}\nAnything Other Relevant information: {AnythingRelevant}\n2.Journal Prompts asked previously:Question1:{Question1}\nQuestion2:{Question2}3. Current journal reflection of the patient:{PatientJournalReflection}3.\n\nUsing the above information, craft the perfect Journal Prompt based on the 1.patient's history context,2. previous journal prompts asked, and 3. current journal reflection of the patient.""",
+    input_variables=["MainProblems","AnythingRelevant","Question1","Question2","PatientJournalReflection"]
+
 )
 
+followUpCheckUpAdviceChain = create_structured_output_chain(output_schema=followUpCheckUpAdviceDetails_schema,llm = followUpCheckUpAdvice_llm,prompt=followUpCheckUpAdvicePrompt)
 
-class QAretrivalChain:
-    """Special QA chain pinecone with the pinecone vectorstore"""
-
-    @classmethod
-    def init(cls, PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME):
-        """Initialize the QAretrivalChain with the pinecone API key and environment"""
-                # Create LLMChain
-        try:
-            vectorstore = cls._initPinecone(PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME)
-            qa_chain = RetrievalQA.from_chain_type(
-            llm= OpenAI(model_name="gpt-3.5-turbo-0613", temperature=0),
-            chain_type="refine",
-            retriever=vectorstore.as_retriever(),
-            verbose=True,
-            )
-        except Exception as e:
-            raise Exception(f"Error creating qa_chain: {e}")
-        
-
-        return qa_chain
+followUpCheckUpAdvice_llmGPT4 = ChatOpenAI(model_name="gpt-4-0613", temperature=1)
+followUpCheckUpAdvicePromptGPT4 = PromptTemplate(
     
-    @classmethod
-    def _initPinecone(cls,PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME):
-        """Returns a pinecone vectorstore"""
-
-        # initialize pinecone
-        pinecone.init(
-            api_key=PINECONE_API_KEY,  # find at app.pinecone.io
-            environment=PINECONE_ENVIRONMENT,  # next to api key in console
-        )
-
-        index_name = INDEX_NAME
-
-        embeddings = OpenAIEmbeddings(model='text-embedding-ada-002')
-
-        # List all indexes information
-        index_description = pinecone.describe_index(index_name)
-        print('index_description: ', index_description)
-
-        index = pinecone.Index(index_name) 
-        index_stats_response = index.describe_index_stats()
-        print('index_stats_response: ', index_stats_response)
-
-        # Create vectorstore
-        try:
-            vectorstore = Pinecone(index, embeddings.embed_query, "text")
-            print('vectorstore created succesfully')
-            return vectorstore
-        except Exception as e:
-            raise Exception(f"Error creating vectorstore: {e}")
+        template = """Role:You are a Theripst checking up on a patient daily, your goal is to give the patient advice based on their journal reflection. Craft the perfect advice based on:\n1.History of context of the patient:\nMain Problems: {MainProblems}\nAnything Other Relevant information: {AnythingRelevant}\n2.Journal Prompts asked previously:Question1:{Question1}\nQuestion2:{Question2}3. Current journal reflection of the patient:{PatientJournalReflection}3.\n\nUsing the above information, craft the perfect Journal Prompt based on the 1.patient's history context,2. previous journal prompts asked, and 3. current journal reflection of the patient.\nFeedback:{feedback}""",
+        input_variables=["MainProblems","AnythingRelevant","Question1","Question2","PatientJournalReflection","feedback"]
+    
+    )
+followUpCheckUpAdviceChainGPT4 = create_structured_output_chain(output_schema=followUpCheckUpAdviceDetails_schema,llm = followUpCheckUpAdvice_llmGPT4,prompt=followUpCheckUpAdvicePromptGPT4)
