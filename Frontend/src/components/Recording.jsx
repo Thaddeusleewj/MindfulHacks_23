@@ -4,6 +4,8 @@ import { supabase } from "../API/Auth";
 import { MicOff, Mic } from "lucide-react";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
 
+import axios from "axios";
+
 export default function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioFile, setAudioFile] = useState({
@@ -31,16 +33,27 @@ export default function App() {
     audio.controls = true;
     document.body.appendChild(audio);
     console.log(typeof blob.type);
+    let formData = new FormData();
+    let audioFile = new File([blob], "audio.mp3", { type: blob.type })  
+    formData.append("file", audioFile, "audio.mp3");
+    axios
+      .post("http://127.0.0.1:5000/transcript", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleAudioUpload = (e) => {
     let file = e.target.file[0];
 
     // Check for the format of the file
-    if (file){
-      console.log('The file is', file);
+    if (file) {
+      console.log("The file is", file);
     }
-  }
+  };
 
   return (
     <div className="flex w-full justify-center items-center">
