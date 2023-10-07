@@ -1,0 +1,72 @@
+{
+   "manifest_version": 3,
+   "name": "TherapLink",
+   "description": "Virtual Pet Assistant",
+   "version": "1.0",
+   "background": {
+      "service_worker": "background.js"
+   },
+   "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+         "16": "images/Qlee.png",
+         "32": "images/Qlee.png",
+         "48": "images/Qlee.png",
+         "128": "images/Qlee.png"
+      }
+   },
+   "permissions": [
+      "contextMenus",
+      "tabs",
+      "scripting",
+      "activeTab",
+      "storage"
+   ],
+   "host_permissions": [
+      "*://*/*"
+   ],
+   "icons": {
+      "16": "images/Qlee.png",
+      "32": "images/Qlee.png",
+      "48": "images/Qlee.png",
+      "128": "images/Qlee.png"
+   },
+   "content_scripts": [
+      {
+         "js": [
+            "content.js",
+            "content-qlee.js"
+         ],
+         "css": [
+            "content.css"
+         ],
+         "matches": [
+            "https://*/*",
+            "http://*/*"
+         ]
+      }
+   ],
+   "commands": {
+      "NewPet": {
+         "suggested_key": {
+            "default": "Alt+N",
+            "mac": "Alt+N"
+         },
+         "description": "Create"
+      },
+      "isDeactivate": {
+         "suggested_key": {
+            "default": "Alt+T",
+            "mac": "Alt+T"
+         },
+         "description": "Stop"
+      },
+      "invisible": {
+         "suggested_key": {
+            "default": "Alt+I",
+            "mac": "Alt+I"
+         },
+         "description": "Hide"
+      }
+   }
+}

@@ -6,7 +6,8 @@ python-dotenv
 datasets 
 langchain 
 openai 
-tiktoken
 autogen
 Flask
 Gunicorn
+pinecone-client
+supabase

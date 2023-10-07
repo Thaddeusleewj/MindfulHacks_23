@@ -1,11 +1,18 @@
 
-from langchain import LLMChain, OpenAI, PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains.openai_functions import (
     create_openai_fn_chain,
     create_structured_output_chain,
 )
+
+from datetime import datetime
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.llms import OpenAI
+from langchain.memory import VectorStoreRetrieverMemory
+from langchain.chains import ConversationChain
+from langchain.prompts import PromptTemplate
+from .memory import memory
 
 eventDetails_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
 eventDetails_schema = {
@@ -30,22 +37,24 @@ eventDetails = create_structured_output_chain(output_schema=eventDetails_schema,
 
 
 
-location_llm = ChatOpenAI(model_name="gpt-4-0613", temperature=1)
-locationExtractorSchema = {
-    "name": "locationExtractorSchema",
-    "description": "Format and extract location of disruption from the given text",
-    "type": "object",
-    "properties": {
-        "location": {
-            "type": "string",
-            "Description": "Location of Disruption Event.Location should include any landmarks,cities, countries and addresses, output an address searchable in googleMaps be as specific as possible."
-        }
-    },
-    "required": ["location"]
-}
-locationExtractorPrompt = PromptTemplate(
-    template = """Role:You are a Location Extractor,your goal is to extract the location of the disruption event from the given text. Location of Disruption Event. Examples: 1.French Pass, New Zealand 2.Xiamen Fujian Chain,3.Perry, Florida, USA. \n\nArticle Title:{articleTitle}\n{articleText}\nEnd of article\n\nTask: Extract Location of disruption event.Location should include any landmarks,cities, countries and addresses, output an address searchable in googleMaps be as specific as possible.Feedback:{feedback}""",
-    input_variables=["articleTitle","articleText","feedback"]
-)
+llm = OpenAI(temperature=0) # Can be any valid LLM
+_DEFAULT_TEMPLATE = """The following is a friendly conversation between a human and a theripist. The theripist is meant to help the human with her mental health issues in a positive manner, giving inspirational advice with relevance to the context of the human. If the theripist does not know the answer to a question, it truthfully says it does not know.
 
-locationExtractor = create_structured_output_chain(output_schema=locationExtractorSchema,llm = location_llm,prompt=locationExtractorPrompt)
+Relevant pieces of previous conversation:
+{history}
+
+(You do not need to use these pieces of information if not relevant)
+
+Current conversation:
+Human: {input}
+AI:"""
+PROMPT = PromptTemplate(
+    input_variables=["history", "input"], template=_DEFAULT_TEMPLATE
+)
+conversation_with_summary = ConversationChain(
+    llm=llm, 
+    prompt=PROMPT,
+    # We set a very low max_token_limit for the purposes of testing.
+    memory=memory,
+    verbose=True
+)

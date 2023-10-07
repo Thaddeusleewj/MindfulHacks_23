@@ -7,7 +7,6 @@ app = Flask(__name__)
 def hello_world():
     return 'hello world'
 
-#post request to use whisper api to transcript audio 
 @app.route('/transcript', methods=['POST'])
 def transcript():
     files = request.files
@@ -20,7 +19,6 @@ def transcript():
     transcript = openai.Audio.transcribe("whisper-1", audio_file)
     
     return transcript
-
 
 if __name__ == '__main__':
     app.run(debug=True)

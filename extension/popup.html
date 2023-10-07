@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TherapLink</title>
+    <link rel="stylesheet" type="text/css" href="./css/main.css" />
+    <link rel="stylesheet" type="text/css" href="popup.css" />
+    <script src="./css/tailwind.js"></script>
+  </head>
+  <body class="rounded-lg">
+    <div class="text-xl font-bold">Hello</div>
+    <div class="container">
+      <label for="switch1">睡覺</label>
+      <label class="switch">
+        <input type="checkbox" data-Myclass="sleeping" id="switch1" />
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <div class="container">
+      <label for="switch2">隱形</label>
+      <label class="switch">
+        <input type="checkbox" data-Myclass="invisible" id="switch2" />
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="container">
+      <label for="switch3">停用</label>
+      <label class="switch">
+        <input type="checkbox" data-Myclass="deactivate" id="switch3" />
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <hr />
+    <div class="image-container">
+      <img
+        src="https://raw.githubusercontent.com/jx06T/PetPal__ChromeExtensions/main/images/pet_walk.gif"
+        class="jx06pet"
+      />
+    </div>
+    <div class="slider-containerr">
+      <label for="switch">大小</label>
+      <input type="range" min="40" max="300" value="120" id="slider1" />
+      <label for="switch">顏色</label>
+      <input type="range" min="0" max="360" value="0" id="slider2" />
+      <hr />
+      <div class="slider-containerr">
+        <button id="createButton">產生</button>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
