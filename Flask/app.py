@@ -1,6 +1,11 @@
 from flask import Flask, request
 import openai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+openai.api_key = openai_api_key
 
 app = Flask(__name__)
 
@@ -15,13 +20,10 @@ def transcript():
     file = files.get('file')
     print(file)
     file.save("./temp.mp3")
-    # with open("temp.mp3", "wb") as f:
-    #     f.write(file)
-    #     f.close()
         
     with open("./temp.mp3", "rb") as f:
         print("Processing...")
-        # transcript = openai.Audio.transcribe("whisper-1", f)
+        transcript = openai.Audio.transcribe("whisper-1", f)
         f.close()
     transcript = "HI"
     os.remove("./temp.mp3")
