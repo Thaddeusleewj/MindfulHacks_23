@@ -90,13 +90,19 @@ def hello_world():
 
 #     return response
 
+@app.route('/get_checkUp_question', methods=['GET'])
+def get_checkup_question():
+    checkup_question = TherapistLLM.get_checkUp_question()
+    session['checkup_question'] = checkup_question
+    return checkup_question
 
-# @app.route('/checkup', methods=['GET'])
-# def get_checkup_question():
-#     checkup_question = TherapistLLM.get_checkUp_question()
-#     session['checkup_question'] = checkup_question
-#     return checkup_question
-
+# @app.route('/obtain_follow_up_checkUp_advice', methods=['POST'])
+# def get_follow_up_checkUp_advice():
+#     # Takes in two inputs, checkUp_question, and user_response --> returns follow_up_checkUp_advice
+#     checkUp_question = 
+    
+#     checkUp_question:tuple[str,str], 
+#     user_response:str
 
 # Test supabase insert
 @app.route('/insert', methods=['GET'])

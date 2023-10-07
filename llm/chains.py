@@ -17,27 +17,28 @@ from langchain.vectorstores import Pinecone
 
 patientInfo_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
 patientInfoDetails_schema = {
-    "name": "eventDetails_schema",
-    "description": "Generates, a questions to checkup on the patient's mental health based on the patients history",
+    "name": "patientInfoKeyPoints",
+    "description": "Taking in transcript of therapy session, and outputting key points of the session,including main problems faced, feelings, etc",
     "type": "object",
     "properties": {
-        "Question1":{
+        "MainProblems":{
             "type": "string",
-            "Description": "Perfect checkup Question based on:\n1.History of context of the patient\nGood Journaling Prompt Examples"
+            "Description": "Main problems faced by the patient"
         },
-        "Question2":{
+        "PatientInfo":{
             "type": "string",
-            "Description": "Another relevant checkup question, very different froom Question1"
+            "Description": "Summary of the patient's mental health"
         },
     },# TODO: Get actual disruption Event Date, and accurate loop
-    "required": ["Question1","Question2"]
+    "required": ["MainProblems","PatientInfo"]
 }
 
+# TODO: ADD THE FUCKIGN IGIGEIGEIFNIFEANIO
 patientInfoPrompt = PromptTemplate(
-    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What are my goals and objectives related to this problem or challenge?\n2.How can I prioritize and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:\n{patient_info}""",
-    input_variables=["patient_info"]
+    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What are my goals and objectives related to this problem or challenge?\n2.How can I prioritize and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:\n{transcript}""",
+    input_variables=["transcript"]
 )
-patientInfoChain = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=checkUpPrompt)
+patientInfoChain = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llm,prompt=patientInfoPrompt)
 
 checkUp_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
 checkUpDetails_schema = {
