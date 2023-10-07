@@ -68,29 +68,43 @@ from Supabase.Insertor import SupabaseInsertor
 def hello_world():
     return 'hello world'
 
-@app.route('/transcript', methods=['POST'])
-def transcript():
-    print(request)
-    files = request.files
-    file = files.get('file')
-    print(file)
-    file.save("./temp.mp3")
+# @app.route('/transcript', methods=['POST'])
+# def transcript():
+#     print(request)
+#     files = request.files
+#     file = files.get('file')
+#     print(file)
+#     file.save("./temp.mp3")
         
-    with open("./temp.mp3", "rb") as f:
-        print("Processing...")
-        transcript = openai.Audio.transcribe("whisper-1", f)
-        f.close()
-    os.remove("./temp.mp3")
-    response = supabaseInsertor.addTherapyData(transcript)
-    print(response)
+#     with open("./temp.mp3", "rb") as f:
+#         print("Processing...")
+#         transcript = openai.Audio.transcribe("whisper-1", f)
+#         f.close()
 
-    return response
+#     os.remove("./temp.mp3")
+#     response = supabaseInsertor.addTherapyData(transcript)
+#     print(response)
+
+#     return response
+
 
 # @app.route('/checkup', methods=['GET'])
 # def get_checkup_question():
 #     checkup_question = TherapistLLM.get_checkUp_question()
 #     session['checkup_question'] = checkup_question
 #     return checkup_question
+
+
+# Test supabase insert
+@app.route('/insert', methods=['GET'])
+def insertText():
+    sample_text = "FUCK THIS SHITTTTT"
+    print(request)
+    response = supabaseInsertor.addTherapyData(sample_text)
+    print(response)
+
+    return response
+
 
 if __name__ == '__main__':
    app.run()
