@@ -20,7 +20,7 @@ class TherapistLLM:
     Short-term memory will be lost at each new creation of the TheripistLLM
     """
 
-    def __init__(self):
+    def __init__(self,PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME):
         """Initialize the LLM with whatever other shit we need #TODO
         1. Create new short term memory buffer
         """
@@ -35,7 +35,8 @@ class TherapistLLM:
         self.update_memory(llm_output= output,user_query=query)
         return output
     
-    def get_checkUp_question(self) -> str:
+    @classmethod
+    def get_checkUp_question(cls) -> str:
         """Returns a checkup questions based on Long-Term memory"""
         # TODO
         return "This is the check up Question"
