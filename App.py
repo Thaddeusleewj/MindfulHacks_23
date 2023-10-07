@@ -58,6 +58,8 @@ current_therapistLLM = TherapistLLM()
 #     return render_template('chat.html', query=session.get("query"), result=session.get("result"))
 
 # Generate a checkup question
+
+
     
 @app.route('/checkup', methods=['GET'])
 def get_checkup_question():
