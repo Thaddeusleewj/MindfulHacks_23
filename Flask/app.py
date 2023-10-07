@@ -19,7 +19,6 @@ def transcript():
     file = files.get('file')
     print(file)
     file.save("./temp.mp3")
-        
     with open("./temp.mp3", "rb") as f:
         print("Processing...")
         transcript = openai.Audio.transcribe("whisper-1", f)
