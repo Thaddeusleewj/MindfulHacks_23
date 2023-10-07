@@ -14,15 +14,15 @@ from langchain.chains import ConversationChain
 from langchain.prompts import PromptTemplate
 from .memory import memory
 
-eventDetails_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
-eventDetails_schema = {
+checkUp_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
+checkUpDetails_schema = {
     "name": "eventDetails_schema",
-    "description": "Format and extract the disruption event details from the given article",
+    "description": "Generates, a questions to checkup on the patient's mental health based on the patients history",
     "type": "object",
     "properties": {
-        "keyProblem":{
+        "Question1":{
             "type": "string",
-            "Description": "Key Problem the patient is facing"
+            "Description": "Question as a check up"
         }
     },# TODO: Get actual disruption Event Date, and accurate loop
     "required": ["keyProblem"]

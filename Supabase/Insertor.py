@@ -28,24 +28,44 @@ class SupabaseInsertor:
     def __init__(self, supabase_client:Client):
         self.supabase = supabase_client
 
-    def addTherapy(self,Therapy_transcript:str):
+    def addTherapyData(self,Therapy_transcript:str):
         therapy_dict = self._formatTherapyDict(Therapy_transcript)
         try:
             data, count = self._insertArticleData(therapy_dict)
             id = self._extractArticleId(data)
             therapy_dict['id'] = id
-            logger.info(f'Successfully Inserted article: {therapy_dict.id} with id: {id}')
+            # print('therapy_dict: ', therapy_dict)
+            logger.info(f'Successfully Inserted Therapy: {therapy_dict}')
             return therapy_dict
         except postgrest.exceptions.APIError as e:
             return self._handleInsertError(e, therapy_dict, "Article")
-
-
+        
+    def addCatchUpData(self,catchUp_dict:dict):
+        """Example CatchUp_dict:
+        {
+        "input":"theripistLLM input",
+        "output":"user output",
+        }
+        """
+        try:
+            data, count = self._insertCatchUpData(catchUp_dict)
+            id = self._extractArticleId(data)
+            catchUp_dict['id'] = id
+            # print('therapy_dict: ', therapy_dict)
+            logger.info(f'Successfully Inserted catchUp: {catchUp_dict}')
+            return catchUp_dict
+        except postgrest.exceptions.APIError as e:
+            return self._handleInsertError(e, catchUp_dict, "Article")
+        
     def _formatTherapyDict(self,Therapy: str) -> dict:
         return {
             "text": Therapy,
         }
     def _insertArticleData(self, article_dict:dict):
         return self.supabase.table("therapy").insert(article_dict).execute()
+    
+    def _insertCatchUpData(self, catchUp_dict:dict):
+        return self.supabase.table("checkup").insert(catchUp_dict).execute()
 
     def _extractArticleId(self,data):
         return data[1][0]['id']

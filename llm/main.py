@@ -31,6 +31,8 @@ class TherapistLLM:
     def chat(self, query):
         """Chat with the LLM with what ever memory bullshit later """
         output = conversation_with_summary.predict(input = query)
+        # Update the short-term-memory
+        self.update_memory(llm_output= output,user_query=query)
         return output
     
     def get_checkUp_question(self) -> str:
