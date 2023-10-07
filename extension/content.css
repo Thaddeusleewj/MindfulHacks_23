@@ -1,0 +1,92 @@
+.jx06pet {
+  z-index: 9999;
+  user-select: none;
+  /* cursor: grab; */
+  /* filter: blur(0px)   hue-rotate(180deg)!important; */
+  /* filter: blur(0px) !important; */
+  /* pointer-events: none; */
+  /* background: pink; */
+  background-size: cover;
+}
+
+.jx06Cpet {
+  /* cursor: url("https://raw.githubusercontent.com/jx06T/PetPal__ChromeExtensions/V1.5/images/mouse.png"), grab; */
+  cursor: url("https://raw.githubusercontent.com/jx06T/PetPal__ChromeExtensions/main/images/mouse.png"),
+    grab;
+}
+
+.jx06Cbody {
+  cursor: url("https://raw.githubusercontent.com/jx06T/PetPal__ChromeExtensions/main/images/Penguin.gif"),
+    grab !important;
+  /* background-color: pink; */
+}
+
+.jx06fish {
+  z-index: 9990;
+  filter: blur(0px) !important;
+  transform-origin: right center;
+  /* pointer-events: none; */
+}
+
+.jx06invisible {
+  /* display: none !important; */
+  pointer-events: none;
+  opacity: 0.1 !important;
+}
+
+#theraplink-container {
+  position: fixed;
+  background: transparent;
+  z-index: 2147483643;
+  width: 100vw;
+  height: 100vh;
+  left: 0px;
+  top: 0px;
+  transform: translate(0px, 0px);
+  pointer-events: none;
+}
+
+.optionGrp {
+  display: flex;
+  position: absolute;
+  bottom: 75%;
+  left: 100%;
+  background: white;
+  width: 125px;
+  aspect-ratio: 4/3;
+  border-radius: 10px 10px 10px 0;
+  box-shadow: 0px 0px 5px 2.5px rgba(0, 0, 0, 0.15);
+}
+
+.optionGrp::before {
+  content: "";
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid white;
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
+.submit {
+  border: none;
+  background: transparent;
+  width: 20px;
+  height: 20px;
+  background: pink;
+  border-radius: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input {
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.hide {
+  visibility: collapse;
+}
