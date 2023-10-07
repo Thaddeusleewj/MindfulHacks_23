@@ -9,6 +9,7 @@ let testd = 1;
 let STATE = {};
 let GRAVITY = 0.025;
 
+const dialogBox = document.createElement("div");
 let bodyContainer = document.createElement("div");
 bodyContainer.setAttribute("id", "theraplink-container");
 // bodyContainer.innerHTML += `<div style="position: absolute; top: 0; left: 0; width: 128px; height: 128px; background: pink;"></div>`;
@@ -70,6 +71,7 @@ class Qlee {
     qlee.style.zIndex = "2";
     this.width = 128;
     this.height = 128;
+    qlee.classList.add("QLEE");
     qlee.style.width = `${this.width}px`;
     qlee.style.height = `${this.height}px`;
     qlee.style.left = `${this.x}px`;
@@ -81,20 +83,52 @@ class Qlee {
     qlee.addEventListener("mousedown", (e) => {
       this.startDrag(e, this);
     });
-    const dialogBox = document.createElement("div");
     dialogBox.style.position = "absolute";
-    dialogBox.style.position = "absolute";
+    dialogBox.style.top = `-175px`;
+    dialogBox.style.left = `150px`;
+    dialogBox.style.width = `300px`;
+    dialogBox.style.height = `200px`;
+    dialogBox.style.background = `pink`;
+    dialogBox.style.zIndex = `1`;
+    dialogBox.classList.add("hide");
+    dialogBox.classList.add("optionGrp");
+    let promptBox = document.createElement("div");
+    promptBox.innerHTML = "hi";
+    let inputDiv = document.createElement("div");
+    inputDiv.style.display = "flex";
+    inputDiv.style.marginTop = "auto";
+    inputDiv.style.width = "100%";
+    let inputBox = document.createElement("input");
+    inputBox.classList.add("inputBox");
+    let inputButt = document.createElement("button");
+    inputButt.classList.add("submit");
+    inputButt.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  style="rotate: 45deg" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+  <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+</svg>`;
+    inputDiv.appendChild(inputBox);
+    inputDiv.appendChild(inputButt);
+    dialogBox.appendChild(promptBox);
+    dialogBox.appendChild(inputDiv);
+    async function logMovies() {
+      const response = await fetch("http://example.com/movies.json");
+      const movies = await response.json();
+      console.log(movies);
+    }
+    logMovies();
 
     qlee.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       if (e.button == 2) {
         this.changeState(1);
+        dialogBox.classList.toggle("hide");
       }
     });
-    if (bodyContainer.children.length > 0) {
+
+    if (bodyContainer.children.length > 1) {
       bodyContainer.innerHTML = "";
     }
     this.img = qlee;
+    qlee.appendChild(dialogBox);
     bodyContainer.appendChild(qlee);
     this.interval;
     this.isDrag = false;
@@ -186,7 +220,7 @@ function newQlee(data) {
   chrome.storage.local.get(["Pets"]).then((NPets) => {
     LocalityPets = NPets.Pets;
   });
-  if (Pets.length > 0) {
+  if (Pets.length > 1) {
     Pets = [];
   }
   Pets.push(new Qlee(...GetRandXY(), Number(data.size), data.id));
@@ -196,7 +230,7 @@ async function initialPet(count = 0) {
   const result = await chrome.storage.local.get(["isDeactivate"]);
   console.log(result);
   if (result.isDeactivate) {
-    if (Pets.length > 0) {
+    if (Pets.length > 1) {
       for (const Pet of Pets) {
         Pet.img.remove();
       }
