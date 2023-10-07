@@ -8,7 +8,7 @@ from langchain.chains import ConversationChain
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain.chains import LLMChain
-import faiss
+# import faiss
 
 from langchain.docstore import InMemoryDocstore
 from .chains import transcriptExtractorChain, transcriptExtractorChainGPT4,checkUpChain, checkUpChainGPT4,followUpCheckUpAdviceChain,followUpCheckUpAdviceChainGPT4
@@ -185,7 +185,7 @@ class TherapistLLM:
         
         return results
     
-    def get_checkUp_question(self) -> tuple[str,str]:
+    def get_checkUp_question(self) -> list([str,str]):
         """Returns a checkup questions based on Long-Term memory"""
         # TODO 
         print('Extracting from Supabase')
@@ -201,13 +201,13 @@ class TherapistLLM:
         # Update the latest journal prompt
         self.updateLatestJournalPrompt(JournalPrompt1 = checkUp_questions["Question1"],JournalPrompt2 = checkUp_questions["Question2"])
 
-        return ("This is the check up Question1", "This is check up Question2")
+        return ["This is the check up Question1", "This is check up Question2"]
     
     def updateLatestJournalPrompt(self,JournalPrompt1:str,JournalPrompt2:str):
         self.latestJournalPrompt1 = JournalPrompt1
         self.latestJournalPrompt2 = JournalPrompt2
 
-    def get_follow_up_checkUp_advice(self, user_response:str) -> tuple[str,str]:
+    def get_follow_up_checkUp_advice(self, user_response:str) -> list([str,str]):
         """Returns a follow up checkup questions based on Long-Term memory"""
 
         # Check if latestJournalPrompt1 and latestJournalPrompt2 is None

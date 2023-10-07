@@ -110,7 +110,9 @@ class Qlee {
     dialogBox.appendChild(promptBox);
     dialogBox.appendChild(inputDiv);
     async function logMovies() {
-      const response = await fetch("http://example.com/movies.json");
+      const response = await fetch(
+        "http://127.0.0.1:5000/get_checkUp_question"
+      );
       const movies = await response.json();
       console.log(movies);
     }

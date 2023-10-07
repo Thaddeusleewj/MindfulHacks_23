@@ -3,9 +3,10 @@
   src: url("Inter-VariableFont_slnt\,wght.ttf");
 }
 
-*,
-*::before,
-*::after {
+#theraplink-container,
+#theraplink-container > *,
+#theraplink-container > *::before,
+#theraplink-container > *::after {
   box-sizing: border-box;
   font-family: Inter;
 }

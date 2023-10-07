@@ -14,3 +14,4 @@ supabase
 faiss-cpu
 tiktoken
 jsonschema
+flask_cors==3.0.10

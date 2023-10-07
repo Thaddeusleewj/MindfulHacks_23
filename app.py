@@ -7,9 +7,12 @@ from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for, session
 # from embedstore import load_embedding
 import sys
+from flask_cors import CORS, cross_origin
+
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 # Get the absolute path to the directory containing this script (app.py)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
