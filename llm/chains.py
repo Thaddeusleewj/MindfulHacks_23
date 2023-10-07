@@ -15,6 +15,30 @@ from .memory import memory
 import pinecone
 from langchain.vectorstores import Pinecone
 
+patientInfo_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
+patientInfoDetails_schema = {
+    "name": "eventDetails_schema",
+    "description": "Generates, a questions to checkup on the patient's mental health based on the patients history",
+    "type": "object",
+    "properties": {
+        "Question1":{
+            "type": "string",
+            "Description": "Perfect checkup Question based on:\n1.History of context of the patient\nGood Journaling Prompt Examples"
+        },
+        "Question2":{
+            "type": "string",
+            "Description": "Another relevant checkup question, very different froom Question1"
+        },
+    },# TODO: Get actual disruption Event Date, and accurate loop
+    "required": ["Question1","Question2"]
+}
+
+patientInfoPrompt = PromptTemplate(
+    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What are my goals and objectives related to this problem or challenge?\n2.How can I prioritize and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:\n{patient_info}""",
+    input_variables=["patient_info"]
+)
+patientInfoChain = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=checkUpPrompt)
+
 checkUp_llm = OpenAI(model_name="gpt-4-0613", temperature=1)
 checkUpDetails_schema = {
     "name": "eventDetails_schema",
@@ -33,12 +57,11 @@ checkUpDetails_schema = {
     "required": ["Question1","Question2"]
 }
 
-eventDetailsPrompt = PromptTemplate(
+checkUpPrompt = PromptTemplate(
     template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What are my goals and objectives related to this problem or challenge?\n2.How can I prioritize and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:\n{patient_info}""",
     input_variables=["patient_info"]
 )
-
-eventDetails = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=eventDetailsPrompt)
+checkUpChain = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=checkUpPrompt)
 
 
 
@@ -66,7 +89,7 @@ conversation_with_summary = ConversationChain(
 
 
 class QAretrivalChain:
-    """Special QA chain pinecone"""
+    """Special QA chain pinecone with the pinecone vectorstore"""
 
     @classmethod
     def init(cls, PINECONE_API_KEY, PINECONE_ENVIRONMENT,INDEX_NAME):

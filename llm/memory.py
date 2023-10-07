@@ -9,6 +9,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import Pinecone
 import faiss
+import openai
 
 from langchain.docstore import InMemoryDocstore
 from langchain.vectorstores import FAISS
@@ -22,6 +23,6 @@ retriever = vectorstore.as_retriever(search_kwargs=dict(k=3))
 memory = VectorStoreRetrieverMemory(retriever=retriever)
 
 # # When added to an agent, the memory object can save pertinent information from conversations or used tools
-memory.save_context({"input": "My problem is I very sad due to a breakup with my girlfriend"}, {"output": "Oh, I'm so sorry to hear that, that can be really tough. Want to talk about it? I’m happy to lend an ear. Was it a mutual decision or a difficult break up?"})
+memory.save_context({"input": "My problem is I very sad due to a breakup with my girlfriend"}, {"output": "Oh, I'm so sorry to hear that, that can be really tough. Want to talk about it? Im happy to lend an ear. Was it a mutual decision or a difficult break up?"})
 # memory.save_context({"input": "My favorite sport is soccer"}, {"output": "..."})
 # memory.save_context({"input": "I don't the Celtics"}, {"output": "ok"}) #

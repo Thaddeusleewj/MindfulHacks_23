@@ -1,8 +1,8 @@
 import os
 import openai
-import pinecone
+import pineconeManager
 import itertools
-
+from supabase import create_client, Client
 from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for, session
 # from embedstore import load_embedding
@@ -20,10 +20,15 @@ Supabase_directory = os.path.join(current_directory, 'Supabase')
 sys.path.append(Supabase_directory)
 sys.path.append(LLM_directory)
 # sys.path.append(utils_directory)
+SUPABASE_URL=os.getenv("SUPABASE_URL")
+SUPABASE_KEY=os.getenv("SUPABASE_KEY")
+client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+supabaseInsertor = SupabaseInsertor(client)
 # app.secret_key = os.getenv("SECRET_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 from llm.main import TherapistLLM
+from Supabase.Insertor import SupabaseInsertor
 
 # current_therapistLLM = TherapistLLM()
 
@@ -59,13 +64,33 @@ from llm.main import TherapistLLM
 
 # Generate a checkup question
 
+@app.route('/')
+def hello_world():
+    return 'hello world'
 
-    
-@app.route('/checkup', methods=['GET'])
-def get_checkup_question():
-    checkup_question = TherapistLLM.get_checkUp_question()
-    session['checkup_question'] = checkup_question
-    return checkup_question
+@app.route('/transcript', methods=['POST'])
+def transcript():
+    print(request)
+    files = request.files
+    file = files.get('file')
+    print(file)
+    file.save("./temp.mp3")
+        
+    with open("./temp.mp3", "rb") as f:
+        print("Processing...")
+        transcript = openai.Audio.transcribe("whisper-1", f)
+        f.close()
+    os.remove("./temp.mp3")
+    response = supabaseInsertor.addTherapyData(transcript)
+    print(response)
+
+    return response
+
+# @app.route('/checkup', methods=['GET'])
+# def get_checkup_question():
+#     checkup_question = TherapistLLM.get_checkUp_question()
+#     session['checkup_question'] = checkup_question
+#     return checkup_question
 
 if __name__ == '__main__':
    app.run()
