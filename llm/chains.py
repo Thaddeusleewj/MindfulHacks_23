@@ -22,18 +22,22 @@ checkUpDetails_schema = {
     "properties": {
         "Question1":{
             "type": "string",
-            "Description": "Question as a check up"
-        }
+            "Description": "Perfect checkup Question based on:\n1.History of context of the patient\nGood Journaling Prompt Examples"
+        },
+        "Question2":{
+            "type": "string",
+            "Description": "Another relevant checkup question, very different froom Question1"
+        },
     },# TODO: Get actual disruption Event Date, and accurate loop
-    "required": ["keyProblem"]
+    "required": ["Question1","Question2"]
 }
 
 eventDetailsPrompt = PromptTemplate(
-    template = """Role:You are a Theripst extracting key points from transcript of a therpy session, your goal is to extract key details such as Problems faced, Overall emotions.\n\nTranscript: {transcript}""",
-    input_variables=["transcript"]
+    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What are my goals and objectives related to this problem or challenge?\n2.How can I prioritize and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:\n{patient_info}""",
+    input_variables=["patient_info"]
 )
 
-eventDetails = create_structured_output_chain(output_schema=eventDetails_schema,llm = eventDetails_llm,prompt=eventDetailsPrompt)
+eventDetails = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=eventDetailsPrompt)
 
 
 
@@ -57,4 +61,12 @@ conversation_with_summary = ConversationChain(
     # We set a very low max_token_limit for the purposes of testing.
     memory=memory,
     verbose=True
+)
+
+
+# Retrival QA chain
+qa = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type="stuff",
+    retriever=vectorstore.as_retriever()
 )

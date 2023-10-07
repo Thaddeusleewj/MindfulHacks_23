@@ -4,9 +4,10 @@ from datetime import datetime
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import OpenAI
 from langchain.memory import VectorStoreRetrieverMemory
-from langchain.chains import ConversationChain
+from langchain.chains import ConversationChain,RetrievalQA
 from langchain.prompts import PromptTemplate
-
+from langchain.chains import RetrievalQA
+from langchain.vectorstores import Pinecone
 import faiss
 
 from langchain.docstore import InMemoryDocstore
@@ -26,3 +27,12 @@ memory.save_context({"input": "My problem is I very sad due to a breakup with my
 # memory.save_context({"input": "I don't the Celtics"}, {"output": "ok"}) #
 
 # memory
+
+
+class pineconeInit:
+    """
+    Initialize the pinecone client
+    """
+
+    embeddings = OpenAIEmbeddings(model='text-embedding-ada-002')
+    vectorstore = Pinecone(index, embeddings.embed_query, "text")
