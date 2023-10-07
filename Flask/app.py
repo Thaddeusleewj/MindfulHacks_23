@@ -3,11 +3,10 @@ import openai
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-openai.api_key = openai_api_key
-
 app = Flask(__name__)
+
+load_dotenv()
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 @app.route('/')
 def hello_world():
@@ -25,8 +24,9 @@ def transcript():
         print("Processing...")
         transcript = openai.Audio.transcribe("whisper-1", f)
         f.close()
-    transcript = "HI"
+    print(transcript)
     os.remove("./temp.mp3")
+    
     return transcript
 
 if __name__ == '__main__':
