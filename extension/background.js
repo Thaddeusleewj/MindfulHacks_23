@@ -8,7 +8,14 @@ function randId() {
 function debug(...d) {
   console.log(d);
 }
-
+// chrome.storage.local.clear(function () {
+//   var error = chrome.runtime.lastError;
+//   if (error) {
+//     console.error(error);
+//   }
+//   // do something more
+// });
+// chrome.storage.sync.clear();
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
