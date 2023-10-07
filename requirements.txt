@@ -12,3 +12,4 @@ Gunicorn
 pinecone-client
 supabase
 faiss-cpu
+tiktoken

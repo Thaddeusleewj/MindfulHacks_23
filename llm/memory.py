@@ -36,3 +36,5 @@ class pineconeInit:
 
     embeddings = OpenAIEmbeddings(model='text-embedding-ada-002')
     vectorstore = Pinecone(index, embeddings.embed_query, "text")
+
+    def 
