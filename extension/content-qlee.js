@@ -24,6 +24,11 @@ function GetRandXY() {
   ];
 }
 
+const IS_DEV = false;
+const BACKEND_URL = IS_DEV
+  ? "http://127.0.0.1:5000"
+  : "https://mindfulhackspet.onrender.com";
+
 const IMG_URL =
   "https://raw.githubusercontent.com/Thaddeusleewj/MindfulHacks_23/main/extension/images/";
 // const IMG_URL =
@@ -93,30 +98,89 @@ class Qlee {
     dialogBox.classList.add("hide");
     dialogBox.classList.add("optionGrp");
     let promptBox = document.createElement("div");
-    promptBox.innerHTML = "hi";
+    promptBox.style.maxHeight = "calc(200px - 25px)";
+    promptBox.style.overflow = "auto";
     let inputDiv = document.createElement("div");
     inputDiv.style.display = "flex";
-    inputDiv.style.marginTop = "auto";
     inputDiv.style.width = "100%";
+    inputDiv.style.background = "white";
+    inputDiv.style.borderRadius = "20px";
     let inputBox = document.createElement("input");
     inputBox.classList.add("inputBox");
     let inputButt = document.createElement("button");
     inputButt.classList.add("submit");
-    inputButt.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  style="rotate: 45deg" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+    inputButt.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"  style="rotate: 45deg" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
   <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
 </svg>`;
+
+    let hintButt = document.createElement("button");
+    hintButt.classList.add("hint");
+    hintButt.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightbulb-fill" viewBox="0 0 16 16">
+  <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13h-5a.5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm3 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1-.5-.5z"/>
+</svg>`;
+
     inputDiv.appendChild(inputBox);
     inputDiv.appendChild(inputButt);
+
+    let divInput = document.createElement("div");
+    divInput.style.display = "flex";
+    divInput.style.gap = "5px";
+    divInput.style.marginTop = "auto";
+
+    divInput.appendChild(inputDiv);
+    divInput.appendChild(hintButt);
     dialogBox.appendChild(promptBox);
-    dialogBox.appendChild(inputDiv);
-    async function logMovies() {
-      const response = await fetch(
-        "http://127.0.0.1:5000/get_checkUp_question"
-      );
-      const movies = await response.json();
-      console.log(movies);
+    dialogBox.appendChild(divInput);
+
+    hintButt.addEventListener("click", async () => {
+      console.log(inputBox.value);
+      if (inputBox.value.length > 0) {
+        if (promptBox.innerHTML.indexOf("Advice") != -1) return;
+        const response = await fetch(
+          `${BACKEND_URL}/obtain_follow_up_checkUp_advice`,
+          {
+            method: "POST",
+            body: {
+              PatientJournalReflection: inputBox.value,
+            },
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            let output = "";
+            for (const [key, value] of Object.entries(data)) {
+              if (key.indexOf("Advice") != -1) {
+                output += `<li>${value}</li>`;
+              }
+            }
+            promptBox.innerHTML += `
+<p>Advice:</p>
+<ol>
+  ${output}
+</ol>`;
+          });
+      }
+    });
+
+    async function getCheckUpQn() {
+      const response = await fetch(`${BACKEND_URL}/get_checkUp_question`);
+      const qnDict = await response.json();
+      let output = "";
+      for (const [key, value] of Object.entries(qnDict)) {
+        if (key.indexOf("Question") != -1) {
+          output += `<li>${value}</li>`;
+        }
+      }
+      promptBox.innerHTML = `
+<p>Hey Qlee here! What's on your mind today?</p>
+<ol>
+  ${output}
+</ol>`;
+
+      return qnDict;
     }
-    logMovies();
+
+    getCheckUpQn();
 
     qlee.addEventListener("contextmenu", (e) => {
       e.preventDefault();

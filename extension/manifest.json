@@ -1,6 +1,6 @@
 {
    "manifest_version": 3,
-   "name": "TherapLink",
+   "name": "JournaLink",
    "description": "Virtual Pet Assistant",
    "version": "1.0",
    "background": {

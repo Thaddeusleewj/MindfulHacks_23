@@ -53,9 +53,9 @@
 .submit {
   border: none;
   background: transparent;
-  width: 20px;
-  height: 20px;
-  background: dark;
+  width: 25px;
+  height: 25px;
+  background: plum;
   border-radius: 100%;
   aspect-ratio: 1;
   display: flex;
@@ -63,10 +63,26 @@
   justify-content: center;
 }
 
+.hint {
+  border: none;
+  background: transparent;
+  width: 25px;
+  height: 25px;
+  background: cyan;
+  border-radius: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 .inputBox {
   border: none;
   outline: none;
   width: 100%;
+  background: transparent;
+  padding: 0 10px;
 }
 
 .hide {
