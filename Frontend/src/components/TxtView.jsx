@@ -9,10 +9,8 @@ const TxtView = () => {
     `Well, to be honest, I'm feeling a bit uncertain about my career aspirations and the path ahead right now. It's like I have all these ideas, but I'm not sure which one is the right one. As for aligning my education and skills with my long-term goals, I guess I could start by talking to people in the field I'm interested in and maybe even try out some internships or courses to get a better sense of what's a good fit. It's all a bit overwhelming, but I think taking small steps and gaining some real-world experience could help me figure things out.`
   );
 
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
-  // console.log(supabaseUrl, process.env);
-  console.log(import.meta.env, import.meta);
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
 

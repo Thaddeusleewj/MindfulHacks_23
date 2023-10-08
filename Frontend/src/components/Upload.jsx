@@ -21,7 +21,7 @@ const Upload = () => {
       });
       formData.append("file", audioFile, "audio.mp3");
       axios
-        .post(process.env.VITE_DEV + "/transcript", formData, {
+        .post(import.meta.env.VITE_DEV + "/transcript", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((res) => {
