@@ -102,7 +102,9 @@ def transcript():
 def get_checkup_question():
     """Returns json with Keys Question1 and Question2, {
         "Question1": "xxxxxxxxxx",
-        "Question2": "xxxxxxxxxx"
+        "Question2": "xxxxxxxxxx",
+        "MainProblems": "xxxxxxxxxx
+        "AnythingRelevant": "xxxxxxxxxx"
     }"""
     checkup_question = therapistLLM.get_checkUp_question()
     print('checkup_question: ', checkup_question)
@@ -115,7 +117,7 @@ def supabasePush():
     PatientJournalReflection = request.form.get('PatientJournalReflection')
 
     catchUp_dict = {
-        "input": f"{therapistLLM.latestJournalPrompt1},{therapistLLM.latestJournalPrompt2}",
+        "input": f"{therapistLLM.latestJournalPrompt1}\{therapistLLM.latestJournalPrompt2}",
         "output": f"{PatientJournalReflection}"
     }
     # Insert the shit to supabase
@@ -125,9 +127,12 @@ def supabasePush():
 @app.route('/obtain_follow_up_checkUp_advice', methods=['POST'])
 def get_follow_up_checkUp_advice():
     """Returns json with Keys Question1 and Question2, {
-        "Advice1": "xxxxxxxxxx",
-        "Advice2": "xxxxxxxxxx"
-    }"""
+            "Advice1": xxxxxxx,
+            "Advice2": xxxxxxx,
+            "Question1":xxxxxxx,
+            "Question2":xxxxxxx,
+            "PatientJournalReflection": xxxxxx,
+        }"""
     # Takes in two inputs, checkUp_question, and user_response --> returns follow_up_checkUp_advice
     PatientJournalReflection = request.form.get('PatientJournalReflection')
     follow_up_checkUp_advice = therapistLLM.get_follow_up_checkUp_advice(user_response = PatientJournalReflection)

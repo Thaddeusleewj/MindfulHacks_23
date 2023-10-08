@@ -63,7 +63,7 @@ from langchain.callbacks.manager import (
     Callbacks,
 )
 
-patientInfo_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
+patientInfo_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=0)
 patientInfoDetails_schema = {
     "name": "patientInfoKeyPoints",
     "description": "Taking in transcript of therapy session, and outputting key points of the session,including main problems faced, feelings, etc",
@@ -88,14 +88,14 @@ patientInfoPrompt = PromptTemplate(
 )
 transcriptExtractorChain = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llm,prompt=patientInfoPrompt)
 
-patientInfo_llmGPT4 = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
+patientInfo_llmGPT4 = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=0)
 patientInfoPromptGPT4 = PromptTemplate(
     template = """Role: You are a transcript extractor for a therapy session, your goal is to extract key information of the patient from the transcript between theripist and patient. Information such as Main Problems and anything u find relevant\nTranscript:\n{transcript}\nFeedback for output:{feedback}""",
     input_variables=["transcript","feedback"]
 )
 transcriptExtractorChainGPT4 = create_structured_output_chain(output_schema=patientInfoDetails_schema,llm = patientInfo_llmGPT4,prompt=patientInfoPromptGPT4)
 
-checkUp_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
+checkUp_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=0)
 checkUpDetails_schema = {
     "name": "eventDetails_schema",
     "description": "Generates, a questions to checkup on the patient's mental health based on the patients history",
@@ -119,7 +119,7 @@ checkUpPrompt = PromptTemplate(
 )
 checkUpChain = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=checkUpPrompt)
 
-checkUp_llmGPT4 = ChatOpenAI(model_name="gpt-4-0613", temperature=1)
+checkUp_llmGPT4 = ChatOpenAI(model_name="gpt-4-0613", temperature=0)
 checkUpPromptGPT4 = PromptTemplate(
     template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What kind of goals and objectives would u want to set, related to this problem X or challenge X?\n2.How do you think you should go about prioritizing and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:1. Main Problems: {MainProblems}\n2. Anything Other Relevant information: {AnythingRelevant}\n\nUsing the above information, craft the perfect Journal Prompt based on the patient's history and the example questions of a good Journaling Prompt.Must output Json.\nFeedback:{feedback}""",
     input_variables=["MainProblems","AnythingRelevant","feedback"]
@@ -127,7 +127,7 @@ checkUpPromptGPT4 = PromptTemplate(
 checkUpChainGPT4 = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llmGPT4,prompt=checkUpPromptGPT4)
 
 
-followUpCheckUpAdvice_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
+followUpCheckUpAdvice_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=0)
 
 followUpCheckUpAdviceDetails_schema = {
     "name": "followUpCheckUpAdviceDetails_schema",
@@ -154,7 +154,7 @@ followUpCheckUpAdvicePrompt = PromptTemplate(
 
 followUpCheckUpAdviceChain = create_structured_output_chain(output_schema=followUpCheckUpAdviceDetails_schema,llm = followUpCheckUpAdvice_llm,prompt=followUpCheckUpAdvicePrompt)
 
-followUpCheckUpAdvice_llmGPT4 = ChatOpenAI(model_name="gpt-4-0613", temperature=1)
+followUpCheckUpAdvice_llmGPT4 = ChatOpenAI(model_name="gpt-4-0613", temperature=0)
 followUpCheckUpAdvicePromptGPT4 = PromptTemplate(
     
         template = """Role:You are a Theripst checking up on a patient daily, your goal is to give the patient advice based on their journal reflection. Craft the perfect advice based on:\n1.History of context of the patient:\nMain Problems: {MainProblems}\nAnything Other Relevant information: {AnythingRelevant}\n2.Journal Prompts asked previously:Question1:{Question1}\nQuestion2:{Question2}3. Current journal reflection of the patient:{PatientJournalReflection}3.\n\nUsing the above information, craft the perfect Journal Prompt based on the 1.patient's history context,2. previous journal prompts asked, and 3. current journal reflection of the patient.\nFeedback:{feedback}""",

@@ -128,6 +128,9 @@ class TherapistLLM:
 
         self.latestJournalPrompt1 = None
         self.latestJournalPrompt2 = None
+
+        self.MainProblems = None
+        self.AnythingRelevant = None
         pass
 
     def _transcriptExtractorChain(self,latest_transcript:dict):
@@ -155,6 +158,7 @@ class TherapistLLM:
 
             # Validate the output
             validation_results = outputValidator.validate(self.checkUpChain, results)
+            print('validation_results check up: ', validation_results)
             if not validation_results[0]:
                 print(f'_checkUpChain Validation Error, Re-Running with feedback: {validation_results[1]}')
 
@@ -185,8 +189,18 @@ class TherapistLLM:
         
         return results
     
-    def get_checkUp_question(self) -> list([str,str]):
-        """Returns a checkup questions based on Long-Term memory"""
+    def get_checkUp_question(self):
+        """
+        Returns a checkup questions based on Long-Term memory
+
+        Returns:
+        {
+            "Question1": "xxxxxxxxxx",
+            "Question2": "xxxxxxxxxx",
+            "MainProblems": "xxxxxxxxxx,
+            "AnythingRelevant": "xxxxxxxxxx"
+        }
+        """
         # TODO 
         print('Extracting from Supabase')
         latest_transcript = self.supabaseExtractor.getLatestTherapyData()
@@ -199,32 +213,56 @@ class TherapistLLM:
         print('checkUp_questions: ', checkUp_questions)
 
         # Update the latest journal prompt
-        self.updateLatestJournalPrompt(JournalPrompt1 = checkUp_questions["Question1"],JournalPrompt2 = checkUp_questions["Question2"])
+        self.updateLatestJournalPrompt(JournalPrompt1 = checkUp_questions["Question1"],JournalPrompt2 = checkUp_questions["Question2"],MainProblems = key_points_dict["MainProblems"],AnythingRelevant = key_points_dict["AnythingRelevant"])
 
-        return ["This is the check up Question1", "This is check up Question2"]
+        return {
+            "Question1": checkUp_questions["Question1"],
+            "Question2": checkUp_questions["Question2"],
+            "MainProblems": key_points_dict["MainProblems"],
+            "AnythingRelevant": key_points_dict["AnythingRelevant"],
+        }
     
-    def updateLatestJournalPrompt(self,JournalPrompt1:str,JournalPrompt2:str):
+    def updateLatestJournalPrompt(self,JournalPrompt1:str,JournalPrompt2:str,MainProblems:str,AnythingRelevant:str):
         self.latestJournalPrompt1 = JournalPrompt1
         self.latestJournalPrompt2 = JournalPrompt2
+        self.MainProblems = MainProblems
+        self.AnythingRelevant = AnythingRelevant
 
-    def get_follow_up_checkUp_advice(self, user_response:str) -> list([str,str]):
-        """Returns a follow up checkup questions based on Long-Term memory"""
+    def get_follow_up_checkUp_advice(self, user_response:str) -> dict:
+        """
+        Returns a follow up checkup questions based on Long-Term memory
+
+        Returns:
+        {
+            "Advice1": "xxxxxxxxxx",
+            "Advice2": "xxxxxxxxxx",
+            "Question1": "xxxxxxxxxx",
+            "Question2": "xxxxxxxxxx",
+            "PatientJournalReflection": "xxxxxxxxxx",
+        }
+        """
 
         # Check if latestJournalPrompt1 and latestJournalPrompt2 is None
         if self.latestJournalPrompt1 is None or self.latestJournalPrompt2 is None:
             raise ValueError("latestJournalPrompt1 and latestJournalPrompt2 is None, please run get_checkUp_question() first")
         
         # Run the follow up checkup chain
-        follow_up_checkUp_advice = self._followUpCheckUpAdviceChain(MainProblems = "MainProblems",AnythingRelevant = "AnythingRelevant",Question1 = self.latestJournalPrompt1,Question2 = self.latestJournalPrompt2,PatientJournalReflection = user_response)
+        follow_up_checkUp_advice = self._followUpCheckUpAdviceChain(MainProblems = self.MainProblems ,AnythingRelevant = self.AnythingRelevant, Question1 = self.latestJournalPrompt1,Question2 = self.latestJournalPrompt2,PatientJournalReflection = user_response)
         print('follow_up_checkUp_advice: ', follow_up_checkUp_advice)
 
         # Update the latest journal prompt
         # self.updateLatestJournalPrompt(JournalPrompt1 = follow_up_checkUp_advice["Advice1"],JournalPrompt2 = follow_up_checkUp_advice["Advice2"])
 
-
+        final_follow_up = {
+            "Advice1": follow_up_checkUp_advice["Advice1"],
+            "Advice2": follow_up_checkUp_advice["Advice2"],
+            "Question1": self.latestJournalPrompt1,
+            "Question2": self.latestJournalPrompt2,
+            "PatientJournalReflection": user_response,
+        }
         # TODO 
         #(f"This is the follow up check up Advice1 based on :checkup{checkUp_question}", f"This is follow up check up Advice2 and user_response-->{user_response}")
-        return follow_up_checkUp_advice
+        return final_follow_up
     
     def update_memory(self,llm_output, user_query):
         """Update the current memory with the conversations""" # May need to take note of who is responding first 
