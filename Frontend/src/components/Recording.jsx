@@ -37,7 +37,7 @@ export default function App() {
     let audioFile = new File([blob], "audio.mp3", { type: blob.type });
     formData.append("file", audioFile, "audio.mp3");
     axios
-      .post(import.meta.env.VITE_DEV + "/transcript", formData, {
+      .post(process.env.VITE_DEV + "/transcript", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => {
