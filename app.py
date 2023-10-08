@@ -104,11 +104,23 @@ def get_checkup_question():
         "Question1": "xxxxxxxxxx",
         "Question2": "xxxxxxxxxx"
     }"""
-    # checkup_question = therapistLLM.get_checkUp_question()
-    # print('checkup_question: ', checkup_question)
-    # session['checkup_question'] = checkup_question
+    checkup_question = therapistLLM.get_checkUp_question()
+    print('checkup_question: ', checkup_question)
 
-    return {"Question1": "xxxxxxxxxx", "Question2": "xxxxxxxxxx"}
+    return checkup_question
+
+@app.route('/supabasePush', methods=['POST'])
+def supabasePush():
+    # Gets the user response from the frontend
+    PatientJournalReflection = request.form.get('PatientJournalReflection')
+
+    catchUp_dict = {
+        "input": f"{therapistLLM.latestJournalPrompt1},{therapistLLM.latestJournalPrompt2}",
+        "output": f"{PatientJournalReflection}"
+    }
+    # Insert the shit to supabase
+    supabaseInsertor.addCatchUpData(catchUp_dict)
+
 
 @app.route('/obtain_follow_up_checkUp_advice', methods=['POST'])
 def get_follow_up_checkUp_advice():
@@ -118,10 +130,10 @@ def get_follow_up_checkUp_advice():
     }"""
     # Takes in two inputs, checkUp_question, and user_response --> returns follow_up_checkUp_advice
     PatientJournalReflection = request.form.get('PatientJournalReflection')
-    # follow_up_checkUp_advice = therapistLLM.get_follow_up_checkUp_advice(user_response = PatientJournalReflection)
+    follow_up_checkUp_advice = therapistLLM.get_follow_up_checkUp_advice(user_response = PatientJournalReflection)
 
 
-    return {"Advice1": "this is advice with user", "Advice2": "xxxxxxxxxx"}
+    return follow_up_checkUp_advice
 
 # Test supabase insert
 @app.route('/insert', methods=['GET'])

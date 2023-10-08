@@ -43,7 +43,7 @@ class SupabaseInsertor:
     def addCatchUpData(self,catchUp_dict:dict):
         """Example CatchUp_dict:
         {
-        "input":"theripistLLM input",
+        "input":"Reflection",
         "output":"user output",
         }
         """

@@ -103,7 +103,7 @@ checkUpDetails_schema = {
     "properties": {
         "Question1":{
             "type": "string",
-            "Description": "Perfect checkup Journal Prompt based on:\n1.History of context of the patient\nGood Journaling Prompt Examples"
+            "Description": "Perfect checkup Journal Prompt based on:\n1.History of context of the patient\nGood Journaling Prompt Examples, More about how they are feeling"
         },
         "Question2":{
             "type": "string",
@@ -114,7 +114,7 @@ checkUpDetails_schema = {
 }
 
 checkUpPrompt = PromptTemplate(
-    template = """Role:You are a Theripst checking up on a patient daily, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What kind of goals and objectives would u want to set, related to this problem X or challenge X?\n2.How do you think you should go about prioritizing and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:1. Main Problems: {MainProblems}\n2. Anything Other Relevant information: {AnythingRelevant}\n\nUsing the above information, craft the perfect Journal Prompt based on the patient's history and the example questions of a good Journaling Prompt.Must output Json""",
+    template = """Role:You are a Therapy Journal Prompter, your goal is get the patient to Journel their thoughts/feelings by asking them relevant questions to their issues. Craft the perfect checkup Question based on:\n1.History of context of the patient\n2. Example questions of a good Journaling Prompt.\n\nGood Journaling Prompt Examples:\n1.What kind of goals and objectives would u want to set, related to this problem X or challenge X?\n2.How do you think you should go about prioritizing and organize my thoughts and ideas to effectively solve this problem or challenge?\n3.What did I do today that I am proud of?\n\n Patient History Context:1. Main Problems: {MainProblems}\n2. Anything Other Relevant information: {AnythingRelevant}\n\nUsing the above information, craft the perfect Journal Prompt based on the patient's history and the example questions of a good Journaling Prompt.Must output Json""",
     input_variables=["MainProblems","AnythingRelevant"]
 )
 checkUpChain = create_structured_output_chain(output_schema=checkUpDetails_schema,llm = checkUp_llm,prompt=checkUpPrompt)
