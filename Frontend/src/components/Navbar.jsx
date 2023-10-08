@@ -29,6 +29,7 @@ export default function Sidebar({ children }) {
 
           <SidebarContext.Provider value={{ expanded }}>
             <ul className="flex-1 px-3">
+              {/* {children} */}
               <li>
                 <button onClick={() => {navigate("/")}}>Recording</button>
               </li>
