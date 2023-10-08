@@ -41,9 +41,9 @@ export const RadarData = {
 
 const RadarGraph = () => {
   return (
-    <>
+    <div className="md:w-full lg:w-2/5 flex justify-center items-center">
       <Radar data={RadarData} />
-    </>
+    </div>
   );
 };
 
