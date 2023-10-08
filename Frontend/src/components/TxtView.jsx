@@ -11,7 +11,7 @@ const TxtView = () => {
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
-  console.log(supabaseUrl);
+  console.log(supabaseUrl, process.env);
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
